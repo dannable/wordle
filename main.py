@@ -1,25 +1,31 @@
 import random
 
 # Predefined list of five-letter words
-WORD_LIST = ["apple", "table", "plant", "chair", "stone", "grape", "beach", "track", "fence", "world"]
+WORD_LIST = ["apple", "table", "plant", "chair", "stone", "grape", "beach", "track", "fence", "world", "blood"]
 
 def choose_word():
     return random.choice(WORD_LIST)
 
 def check_guess(guess, secret):
-    feedback = []
+    feedback = ["⬛"] * len(guess)  # Default feedback
     secret_letters = list(secret)
+    guess_used = [False] * len(guess)
+
+    # First pass: Check for correct letters in the correct positions (🟩)
     for i in range(len(guess)):
         if guess[i] == secret[i]:
-            feedback.append("🟩")  # Correct letter in the correct position
-            secret_letters[i] = None  # Mark this letter as used
-        elif guess[i] in secret_letters:
-            feedback.append("🟨")  # Correct letter in the wrong position
-            secret_letters[secret_letters.index(guess[i])] = None
-        else:
-            feedback.append("⬛")  # Letter not in the word
-    return ''.join(feedback)
+            feedback[i] = "🟩"
+            secret_letters[i] = None  # Mark this letter as used in the secret
+            guess_used[i] = True      # Mark this letter as used in the guess
 
+    # Second pass: Check for correct letters in the wrong positions (🟨)
+    for i in range(len(guess)):
+        if not guess_used[i] and guess[i] in secret_letters:
+            feedback[i] = "🟨"
+            secret_letters[secret_letters.index(guess[i])] = None  # Mark as used
+
+    return ''.join(feedback)
+    
 def wordle_game():
     secret_word = choose_word()
     attempts = 6
